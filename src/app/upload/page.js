@@ -35,6 +35,10 @@ function UploadFormContent() {
   const handleUpload = async (e) => {
     e.preventDefault();
 
+    if (typeof window === "undefined") {
+      return;
+    }
+
     if (!file) {
       setUploadStatus("Please select a file");
       return;

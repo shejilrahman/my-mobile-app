@@ -52,41 +52,43 @@ function DownloadPageContent() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const filesRef = ref(database, "posts");
-        const filesQuery = query(
-          filesRef,
-          orderByChild("department_name"),
-          equalTo(department)
-        );
-
-        const snapshot = await get(filesQuery);
-        if (snapshot.exists()) {
-          const filesData = [];
-          snapshot.forEach((childSnapshot) => {
-            filesData.push({
-              id: childSnapshot.key,
-              ...childSnapshot.val(),
-            });
-          });
-          // Sort by timestamp in descending order (newest first)
-          filesData.sort(
-            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+    if (typeof window !== "undefined") {
+      const fetchFiles = async () => {
+        try {
+          const filesRef = ref(database, "posts");
+          const filesQuery = query(
+            filesRef,
+            orderByChild("department_name"),
+            equalTo(department)
           );
-          setFiles(filesData);
-        } else {
-          setFiles([]);
-        }
-      } catch (err) {
-        console.error("Error fetching files:", err);
-        setError("Failed to load files");
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchFiles();
+          const snapshot = await get(filesQuery);
+          if (snapshot.exists()) {
+            const filesData = [];
+            snapshot.forEach((childSnapshot) => {
+              filesData.push({
+                id: childSnapshot.key,
+                ...childSnapshot.val(),
+              });
+            });
+            // Sort by timestamp in descending order (newest first)
+            filesData.sort(
+              (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            setFiles(filesData);
+          } else {
+            setFiles([]);
+          }
+        } catch (err) {
+          console.error("Error fetching files:", err);
+          setError("Failed to load files");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchFiles();
+    }
   }, [department]);
 
   if (loading) {
