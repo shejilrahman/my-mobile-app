@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { ref, push } from "firebase/database";
+import { database } from "@/lib/firebase/client";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -15,10 +17,35 @@ const UploadForms = () => {
   const [file, setFile] = useState(null);
   const [heading, setHeading] = useState("");
   const [description, setDescription] = useState("");
+  const [uploadStatus, setUploadStatus] = useState("");
 
-  const handleUpload = (e) => {
+  const formatHeading = (text) => {
+    return text.toLowerCase().replace(/\s+/g, "_");
+  };
+
+  const handleUpload = async (e) => {
     e.preventDefault();
-    // Handle file upload logic here
+    try {
+      const postData = {
+        department_name: "dop",
+        file_heading: formatHeading(heading),
+        file_description: description,
+        timestamp: new Date().toISOString(),
+        status: "posted",
+      };
+
+      const dbRef = ref(database, "posts");
+      await push(dbRef, postData);
+
+      // Reset form after successful submission
+      setFile(null);
+      setHeading("");
+      setDescription("");
+      setUploadStatus("Post uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading post:", error);
+      setUploadStatus("Error uploading post");
+    }
   };
 
   return (
@@ -46,6 +73,16 @@ const UploadForms = () => {
         />
         <button type="submit">Upload PDF</button>
       </UploadForm>
+      {uploadStatus && (
+        <p
+          style={{
+            marginTop: "10px",
+            color: uploadStatus.includes("Error") ? "red" : "green",
+          }}
+        >
+          {uploadStatus}
+        </p>
+      )}
     </Container>
   );
 };
