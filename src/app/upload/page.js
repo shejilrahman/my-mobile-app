@@ -8,6 +8,7 @@ import {
 } from "firebase/storage";
 import { database, storage } from "@/lib/firebase/client";
 import styled from "styled-components";
+import { useSearchParams } from "next/navigation";
 
 const Container = styled.div`
   padding: 20px;
@@ -19,6 +20,8 @@ const UploadForm = styled.form`
 `;
 
 const UploadForms = () => {
+  const searchParams = useSearchParams();
+  const departmentName = searchParams.get("department") || "default_department";
   const [file, setFile] = useState(null);
   const [heading, setHeading] = useState("");
   const [description, setDescription] = useState("");
@@ -52,7 +55,7 @@ const UploadForms = () => {
 
       // Then create the post in the database
       const postData = {
-        department_name: "dop",
+        department_name: departmentName,
         file_heading: formattedHeading,
         file_description: description,
         file_url: downloadURL,
