@@ -1,7 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { ref, push } from "firebase/database";
-import { database } from "@/lib/firebase/client";
+import { ref as dbRef, push } from "firebase/database";
+import {
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { database, storage } from "@/lib/firebase/client";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -25,26 +30,54 @@ const UploadForms = () => {
 
   const handleUpload = async (e) => {
     e.preventDefault();
+
+    if (!file) {
+      setUploadStatus("Please select a file");
+      return;
+    }
+
     try {
+      // First, upload the file to Firebase Storage
+      const formattedHeading = formatHeading(heading);
+      const fileRef = storageRef(
+        storage,
+        `uploads/${formattedHeading}/${file.name}`
+      );
+
+      // Upload the file
+      const snapshot = await uploadBytes(fileRef, file);
+
+      // Get the download URL
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // Then create the post in the database
       const postData = {
         department_name: "dop",
-        file_heading: formatHeading(heading),
+        file_heading: formattedHeading,
         file_description: description,
+        file_url: downloadURL,
+        file_name: file.name,
         timestamp: new Date().toISOString(),
         status: "posted",
       };
 
-      const dbRef = ref(database, "posts");
-      await push(dbRef, postData);
+      const postsRef = dbRef(database, "posts");
+      await push(postsRef, postData);
 
       // Reset form after successful submission
       setFile(null);
       setHeading("");
       setDescription("");
       setUploadStatus("Post uploaded successfully!");
+
+      // Reset the file input
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) {
+        fileInput.value = "";
+      }
     } catch (error) {
       console.error("Error uploading post:", error);
-      setUploadStatus("Error uploading post");
+      setUploadStatus("Error uploading post: " + error.message);
     }
   };
 
