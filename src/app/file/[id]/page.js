@@ -30,6 +30,12 @@ export default function FileDetailsPage({ params }) {
     fetchFileDetails();
   }, [params.id]);
 
+  const formatFileDetail = (detail) => {
+    return detail
+      .replace(/_/g, " ") // Replace underscores with spaces
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
+  };
+
   if (loading) {
     return <div className="container">Loading...</div>;
   }
@@ -47,7 +53,9 @@ export default function FileDetailsPage({ params }) {
       {/* You might have a .card or .dark-card class in global.css for dark styling */}
       <div className="card">
         {/* Title */}
-        <h1 className="card-title">{fileDetails.file_heading}</h1>
+        <h1 className="card-title">
+          {formatFileDetail(fileDetails.file_heading)}
+        </h1>
 
         {/* File Name info */}
         <div className="card-info">

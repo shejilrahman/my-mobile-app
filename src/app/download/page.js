@@ -37,6 +37,12 @@ const NoFiles = styled.p`
   margin-top: 40px;
 `;
 
+const formatFileHeading = (heading) => {
+  return heading
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 export default function DownloadPage() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -106,7 +112,7 @@ export default function DownloadPage() {
                   router.push(`/file/${file.id}`);
                 }}
               >
-                {file.file_heading}
+                {formatFileHeading(file.file_heading)}
               </li>
             ))
           ) : (
