@@ -47,12 +47,18 @@ function DownloadPageContent() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isClient, setIsClient] = useState(false);
   const searchParams = useSearchParams();
   const department = searchParams.get("department");
   const router = useRouter();
 
+  // Check if we're on client side
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && database) {
       const fetchFiles = async () => {
         try {
           const filesRef = ref(database, "posts");
@@ -71,7 +77,6 @@ function DownloadPageContent() {
                 ...childSnapshot.val(),
               });
             });
-            // Sort by timestamp in descending order (newest first)
             filesData.sort(
               (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
             );
@@ -89,10 +94,14 @@ function DownloadPageContent() {
 
       fetchFiles();
     }
-  }, [department]);
+  }, [department, isClient]);
+
+  if (!isClient || !database) {
+    return <Container>Loading...</Container>;
+  }
 
   if (loading) {
-    return <Container>Loading...</Container>;
+    return <Container>Loading files...</Container>;
   }
 
   if (error) {
@@ -126,7 +135,6 @@ function DownloadPageContent() {
   );
 }
 
-// Main component with Suspense
 export default function DownloadPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>

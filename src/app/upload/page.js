@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import { ref as dbRef, push } from "firebase/database";
 import {
   ref as storageRef,
@@ -19,7 +19,6 @@ const UploadForm = styled.form`
   margin-top: 20px;
 `;
 
-// Separate the form content into its own component
 function UploadFormContent() {
   const searchParams = useSearchParams();
   const departmentName = searchParams.get("department") || "default_department";
@@ -27,6 +26,12 @@ function UploadFormContent() {
   const [heading, setHeading] = useState("");
   const [description, setDescription] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
+  const [isClient, setIsClient] = useState(false);
+
+  // Check if we're on client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const formatHeading = (text) => {
     return text.toLowerCase().replace(/\s+/g, "_");
@@ -35,7 +40,8 @@ function UploadFormContent() {
   const handleUpload = async (e) => {
     e.preventDefault();
 
-    if (typeof window === "undefined") {
+    if (!isClient || !database || !storage) {
+      setUploadStatus("Upload functionality not available");
       return;
     }
 
@@ -89,6 +95,10 @@ function UploadFormContent() {
     }
   };
 
+  if (!isClient) {
+    return <Container>Loading...</Container>;
+  }
+
   return (
     <Container>
       <h1>Upload Form</h1>
@@ -128,7 +138,6 @@ function UploadFormContent() {
   );
 }
 
-// Main component wrapped in Suspense
 export default function UploadPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
