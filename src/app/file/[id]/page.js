@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ref, get } from "firebase/database";
 import { database } from "@/lib/firebase/client";
 
@@ -8,10 +8,13 @@ export default function FileDetailsPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const unwrappedParams = React.use(params);
+
+  const id = unwrappedParams.id;
   useEffect(() => {
     const fetchFileDetails = async () => {
       try {
-        const fileRef = ref(database, `posts/${params.id}`);
+        const fileRef = ref(database, `posts/${id}`);
         const snapshot = await get(fileRef);
 
         if (snapshot.exists()) {
@@ -28,7 +31,7 @@ export default function FileDetailsPage({ params }) {
     };
 
     fetchFileDetails();
-  }, [params.id]);
+  }, [id]);
 
   const formatFileDetail = (detail) => {
     return detail

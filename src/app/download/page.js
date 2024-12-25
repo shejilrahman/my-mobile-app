@@ -2,9 +2,9 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ref, get, query, orderByChild, equalTo } from "firebase/database";
-import { database } from "@/lib/firebase/client";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
+import { useFirebase } from "@/hooks/useFirebase";
 
 const Container = styled.div`
   padding: 20px;
@@ -44,21 +44,16 @@ const formatFileHeading = (heading) => {
 };
 
 function DownloadPageContent() {
+  const { database, initialized } = useFirebase();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isClient, setIsClient] = useState(false);
   const searchParams = useSearchParams();
   const department = searchParams.get("department");
   const router = useRouter();
 
-  // Check if we're on client side
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (isClient && database) {
+    if (initialized && database) {
       const fetchFiles = async () => {
         try {
           const filesRef = ref(database, "posts");
@@ -94,10 +89,10 @@ function DownloadPageContent() {
 
       fetchFiles();
     }
-  }, [department, isClient]);
+  }, [department, initialized, database]);
 
-  if (!isClient || !database) {
-    return <Container>Loading...</Container>;
+  if (!initialized) {
+    return <Container>Initializing Firebase...</Container>;
   }
 
   if (loading) {

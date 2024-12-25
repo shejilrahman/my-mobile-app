@@ -1,14 +1,14 @@
 "use client";
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, Suspense } from "react";
 import { ref as dbRef, push } from "firebase/database";
 import {
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
-import { database, storage } from "@/lib/firebase/client";
 import styled from "styled-components";
 import { useSearchParams } from "next/navigation";
+import { useFirebase } from "@/hooks/useFirebase";
 
 const Container = styled.div`
   padding: 20px;
@@ -20,18 +20,17 @@ const UploadForm = styled.form`
 `;
 
 function UploadFormContent() {
+  const { database, storage, initialized } = useFirebase();
   const searchParams = useSearchParams();
   const departmentName = searchParams.get("department") || "default_department";
   const [file, setFile] = useState(null);
   const [heading, setHeading] = useState("");
   const [description, setDescription] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
-  const [isClient, setIsClient] = useState(false);
 
-  // Check if we're on client side
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  if (!initialized) {
+    return <Container>Initializing Firebase...</Container>;
+  }
 
   const formatHeading = (text) => {
     return text.toLowerCase().replace(/\s+/g, "_");
@@ -40,13 +39,24 @@ function UploadFormContent() {
   const handleUpload = async (e) => {
     e.preventDefault();
 
-    if (!isClient || !database || !storage) {
+    if (!database || !storage) {
       setUploadStatus("Upload functionality not available");
       return;
     }
 
     if (!file) {
       setUploadStatus("Please select a file");
+      return;
+    }
+
+    if (file.type !== "application/pdf") {
+      setUploadStatus("Only PDF files are allowed");
+      return;
+    }
+
+    if (file.size > 500 * 1024) {
+      // 500 KB
+      setUploadStatus("File size must be less than 500 KB");
       return;
     }
 
@@ -94,10 +104,6 @@ function UploadFormContent() {
       setUploadStatus("Error uploading post: " + error.message);
     }
   };
-
-  if (!isClient) {
-    return <Container>Loading...</Container>;
-  }
 
   return (
     <Container>
