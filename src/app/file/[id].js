@@ -6,13 +6,13 @@ import { database } from "@/lib/firebase/client";
 
 export default function FileDetailsPage() {
   const router = useRouter();
-  const { id } = router.query; // URL param for the file ID
+  const { id } = router.query;
 
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch file details on mount (and whenever "id" changes)
+  // Fetch file details
   useEffect(() => {
     const fetchFileDetails = async () => {
       try {
@@ -36,10 +36,9 @@ export default function FileDetailsPage() {
     }
   }, [id]);
 
-  // Handle file download
+  // Handle download
   const handleDownload = async () => {
     try {
-      // Assuming the file's actual download URL is stored under posts/[id]/file_url
       const fileRef = ref(database, `posts/${id}/file_url`);
       const snapshot = await get(fileRef);
       if (snapshot.exists()) {
@@ -52,7 +51,7 @@ export default function FileDetailsPage() {
         const blob = await response.blob();
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
-        link.download = "downloaded_file"; // Name the file as needed
+        link.download = "downloaded_file";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -65,45 +64,56 @@ export default function FileDetailsPage() {
     }
   };
 
-  // Show a loading state if still fetching data
   if (loading) {
     return (
-      <div className="bg-black text-white px-5 py-8 max-w-2xl mx-auto mt-8 rounded-md shadow-lg">
+      <div
+        className="px-4 py-6 rounded-md max-w-2xl mx-auto mt-10 shadow-lg"
+        style={{
+          /* Use global CSS variables for colors */
+          backgroundColor: "var(--color-background)",
+          color: "var(--color-text-main)",
+        }}
+      >
         Loading...
       </div>
     );
   }
 
-  // Show an error message if something went wrong
   if (error) {
     return (
-      <div className="bg-black text-white px-5 py-8 max-w-2xl mx-auto mt-8 rounded-md shadow-lg">
+      <div
+        className="px-4 py-6 rounded-md max-w-2xl mx-auto mt-10 shadow-lg"
+        style={{
+          backgroundColor: "var(--color-background)",
+          color: "var(--color-text-main)",
+        }}
+      >
         Error: {error}
       </div>
     );
   }
 
-  // If everything is fine, render the file details
   return (
-    <div className="bg-black text-white px-5 py-8 max-w-2xl mx-auto mt-8 rounded-md shadow-lg">
+    <div
+      className="px-4 py-6 rounded-md max-w-2xl mx-auto mt-10 shadow-lg"
+      style={{
+        backgroundColor: "var(--color-background)",
+        color: "var(--color-text-main)",
+      }}
+    >
       <h1 className="text-2xl font-bold mb-4">{file.file_heading}</h1>
-      <p className="text-base mb-6">{file.description}</p>
+      <p className="mb-6">{file.description}</p>
 
       <button
         onClick={handleDownload}
-        className="px-6 py-2
-                   bg-black 
-                   text-white 
-                   border 
-                   border-white 
-                   rounded 
-                   hover:bg-gray-800 
-                   focus:outline-none 
-                   focus:ring-2 
-                   focus:ring-white 
-                   transition-all"
+        className="px-6 py-2 rounded hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
+        style={{
+          backgroundColor: "var(--color-background)",
+          color: "var(--color-text-main)",
+          border: `1px solid var(--color-text-main)`,
+        }}
       >
-        Download
+        Downloads
       </button>
     </div>
   );
