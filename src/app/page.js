@@ -18,7 +18,7 @@ export default function HomePage() {
       {!selectedDepartment ? (
         // Department Selection Grid
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {["Department of Post", "Income Tax", "CBI", "IB", "IFS", "IAS"].map(
+          {["dop", "Income Tax", "CBI", "IB", "IFS", "IAS"].map(
             (department) => (
               <div
                 key={department}
@@ -36,11 +36,13 @@ export default function HomePage() {
           )}
         </div>
       ) : (
-        // Download and Upload Forms for Selected Department
+        // Dddddownload and Upload Forms for Selected Department
         <div className="grid grid-cols-1 gap-4">
           <Link
             href={`/download?department=${encodeURIComponent(
-              selectedDepartment
+              selectedDepartment === "Department of Pos"
+                ? "dop"
+                : selectedDepartment
             )}`} // Pass department as query param
             className="block bg-[#1e1e1e] rounded-md p-4 shadow
                        hover:shadow-lg hover:shadow-accent/50
@@ -54,7 +56,9 @@ export default function HomePage() {
 
           <Link
             href={`/upload?department=${encodeURIComponent(
-              selectedDepartment
+              selectedDepartment === "Department of Pos"
+                ? "dop"
+                : selectedDepartment
             )}`} // Pass department as query param
             className="block bg-[#1e1e1e] rounded-md p-4 shadow
                        hover:shadow-lg hover:shadow-accent/50
