@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 import { database } from "@/lib/firebase/client";
@@ -39,16 +39,16 @@ const NoFiles = styled.p`
 
 const formatFileHeading = (heading) => {
   return heading
-    .replace(/_/g, ' ')
+    .replace(/_/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
-export default function DownloadPage() {
+function DownloadPageContent() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const searchParams = useSearchParams();
-  const department = searchParams.get("department"); // default to "dop" if no department specified
+  const department = searchParams.get("department");
   const router = useRouter();
 
   useEffect(() => {
@@ -121,5 +121,14 @@ export default function DownloadPage() {
         </ul>
       </div>
     </Container>
+  );
+}
+
+// Main component with Suspense
+export default function DownloadPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DownloadPageContent />
+    </Suspense>
   );
 }

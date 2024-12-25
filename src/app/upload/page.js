@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { ref as dbRef, push } from "firebase/database";
 import {
   ref as storageRef,
@@ -19,7 +19,8 @@ const UploadForm = styled.form`
   margin-top: 20px;
 `;
 
-const UploadForms = () => {
+// Separate the form content into its own component
+function UploadFormContent() {
   const searchParams = useSearchParams();
   const departmentName = searchParams.get("department") || "default_department";
   const [file, setFile] = useState(null);
@@ -121,6 +122,13 @@ const UploadForms = () => {
       )}
     </Container>
   );
-};
+}
 
-export default UploadForms;
+// Main component wrapped in Suspense
+export default function UploadPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UploadFormContent />
+    </Suspense>
+  );
+}
