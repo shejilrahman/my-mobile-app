@@ -5,6 +5,16 @@ import { useState } from "react";
 export default function HomePage() {
   const [selectedDepartment, setSelectedDepartment] = useState(null); // State for selected department
 
+  const departmentNames = {
+    dop: "Department of Post",
+    it: "Income Tax",
+    gds:"Gramin Dak Sevak",
+    CBI: "Central Bureau of Investigation",
+    IB: "Intelligence Bureau",
+    IFS: "Indian Foreign Service",
+    IAS: "Indian Administrative Service",
+  };
+
   return (
     <main className="dark min-h-screen p-4">
       <h1 className="text-2xl mb-2 font-bold text-center text-blue-500">
@@ -18,7 +28,7 @@ export default function HomePage() {
       {!selectedDepartment ? (
         // Department Selection Grid
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {["dop", "Income Tax", "CBI", "IB", "IFS", "IAS"].map(
+          {["dop", "it","gds", "CBI", "IB", "IFS", "IAS"].map(
             (department) => (
               <div
                 key={department}
@@ -27,9 +37,11 @@ export default function HomePage() {
                            hover:shadow-lg hover:shadow-accent/50
                            hover:text-white transition-all"
               >
-                <h2 className="text-xl font-semibold mb-1">{department}</h2>
+                <h2 className="text-xl font-semibold mb-1">
+                  {departmentNames[department]}
+                </h2>
                 <p className="text-sm text-textSecondary">
-                  View details for {department}
+                  View details for {departmentNames[department]}
                 </p>
               </div>
             )
@@ -50,7 +62,7 @@ export default function HomePage() {
           >
             <h2 className="text-xl font-semibold mb-1">Download Forms</h2>
             <p className="text-sm text-textSecondary">
-              Access various forms for {selectedDepartment}.
+              Access various forms for {departmentNames[selectedDepartment]}
             </p>
           </Link>
 
@@ -66,7 +78,8 @@ export default function HomePage() {
           >
             <h2 className="text-xl font-semibold mb-1">Upload Forms</h2>
             <p className="text-sm text-textSecondary">
-              Submit your forms for {selectedDepartment} quickly and securely.
+              Submit your forms for {departmentNames[selectedDepartment]}{" "}
+              quickly and securely.
             </p>
           </Link>
         </div>
