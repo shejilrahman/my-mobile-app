@@ -42,7 +42,7 @@ export default function DownloadPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const searchParams = useSearchParams();
-  const department = searchParams.get("dept") || "dop"; // default to "dop" if no department specified
+  const department = searchParams.get("department"); // default to "dop" if no department specified
   const router = useRouter();
 
   useEffect(() => {
